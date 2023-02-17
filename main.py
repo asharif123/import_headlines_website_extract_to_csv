@@ -1,6 +1,9 @@
 ######################### script to automate opening website on chrome #####################################
 ####### extract data from website onto csv ##################
+
 from selenium import webdriver
+#### activate headlesss mode so browser does not have to open when extracting data ####
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 import pandas as pd
 
@@ -9,8 +12,15 @@ website = "https://www.thesun.co.uk/sport/football/"
 ##path containing chrome driver
 path = "/Users/awadsharif/Downloads/chromedriver_mac64/chromedriver"
 
+#headless mode
+options = Options()
+#options.headless = True
+options.add_argument('--headless')
+options.add_argument('--disable-gpu')
 service = Service(executable_path=path)
-driver = webdriver.Chrome(service=service)
+
+#set options equal to options to make it headless
+driver = webdriver.Chrome(service=service, options=options)
 driver.get(website)
 
 ##xpath containing subtitle and text of each card on website
@@ -26,6 +36,7 @@ containers = driver.find_elements(by='xpath', value='//div[@class="teaser__copy-
 titles = []
 subtitles = []
 links = []
+
 #use for loop to loop through every copy_container containing subtitle and text
 #container div contains the div for subtitle and text!
 #use find_element since looping through each element!
@@ -51,7 +62,7 @@ my_dict = {'titles': titles, 'subtitles': subtitles, "links": links}
 df_headlines = pd.DataFrame(my_dict)
 
 ##export to csv file
-df_headlines.to_csv('headline.csv')
+df_headlines.to_csv('headline-headless.csv')
 
 ##close the driver after exporting csv
 driver.quit()
